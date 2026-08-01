@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.vivecraft.ViveMain;
 
+import java.util.Arrays;
+
 public class MCVersion implements Comparable<MCVersion> {
 
     public static final MCVersion INVALID = new MCVersion(-1, -1, -1);
@@ -75,12 +77,12 @@ public class MCVersion implements Comparable<MCVersion> {
     public static MCVersion parse(String version, boolean fatal) {
         MCVersion mc;
         String[] segments = version.split("\\.");
+        if ("local".equals(segments[segments.length - 1])) {
+            segments = Arrays.copyOfRange(segments, 0, segments.length - 1);
+        }
         if (segments.length == 2) {
             mc = new MCVersion(Integer.parseInt(segments[0]), Integer.parseInt(segments[1]), 0);
         } else if (segments.length == 3) {
-            mc = new MCVersion(Integer.parseInt(segments[0]), Integer.parseInt(segments[1]),
-                Integer.parseInt(segments[2]));
-        } else if (segments.length == 4 && "local".equals(segments[3])) {
             mc = new MCVersion(Integer.parseInt(segments[0]), Integer.parseInt(segments[1]),
                 Integer.parseInt(segments[2]));
         } else {
