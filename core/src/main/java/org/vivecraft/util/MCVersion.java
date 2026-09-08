@@ -39,7 +39,8 @@ public class MCVersion implements Comparable<MCVersion> {
     public static MCVersion getCurrent() {
         if (CURRENT == null) {
             String bukkitApiVersion = Bukkit.getBukkitVersion();
-            String version = bukkitApiVersion.substring(0, bukkitApiVersion.indexOf("-"));
+            int dashIndex = bukkitApiVersion.indexOf("-");
+            String version = dashIndex >= 0 ? bukkitApiVersion.substring(0, dashIndex) : bukkitApiVersion;
             // remove papers build string
             if (version.contains(".build")) {
                 version = version.substring(0, version.indexOf(".build"));
@@ -83,6 +84,11 @@ public class MCVersion implements Comparable<MCVersion> {
         if (segments.length == 2) {
             mc = new MCVersion(Integer.parseInt(segments[0]), Integer.parseInt(segments[1]), 0);
         } else if (segments.length == 3) {
+            mc = new MCVersion(Integer.parseInt(segments[0]), Integer.parseInt(segments[1]),
+                Integer.parseInt(segments[2]));
+        } else if (segments.length > 3) {
+            // Some hybrid/non-standard loaders (e.g. Youer/Mohist) report extra version
+            // segments beyond major.minor.patch - just use the first three.
             mc = new MCVersion(Integer.parseInt(segments[0]), Integer.parseInt(segments[1]),
                 Integer.parseInt(segments[2]));
         } else {
