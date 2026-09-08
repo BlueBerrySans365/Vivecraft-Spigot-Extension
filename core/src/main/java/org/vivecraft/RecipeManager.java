@@ -88,7 +88,16 @@ public class RecipeManager {
     public void removeRecipes(List<ShapedRecipe> toRemove) {
         Iterator<Recipe> recipes = Bukkit.recipeIterator();
         while (recipes.hasNext()) {
-            Recipe recipe = recipes.next();
+            Recipe recipe;
+            try {
+                recipe = recipes.next();
+            } catch (Exception e) {
+                // Some servers register recipes (often from other mods/plugins) that the
+                // platform itself fails to convert to the Bukkit API (e.g. an ingredient
+                // that resolves to no items, producing an empty RecipeChoice). That is not
+                // something we can fix here, so just skip the broken entry and move on.
+                continue;
+            }
             for (ShapedRecipe customRecipe : toRemove) {
                 if (recipeEquals(customRecipe, recipe)) {
                     recipes.remove();
@@ -100,7 +109,13 @@ public class RecipeManager {
     private boolean hasRecipe(ShapedRecipe recipe) {
         Iterator<Recipe> recipes = Bukkit.recipeIterator();
         while (recipes.hasNext()) {
-            if (recipeEquals(recipe, recipes.next())) {
+            Recipe other;
+            try {
+                other = recipes.next();
+            } catch (Exception e) {
+                continue;
+            }
+            if (recipeEquals(recipe, other)) {
                 return true;
             }
         }
